@@ -6,8 +6,19 @@ var http = require('http'),
 /* Global variables */
 var listingData, server;
 
+// need to get auto/live reload ASAP
+
 var requestHandler = function(request, response) {
   var parsedUrl = url.parse(request.url);
+
+  if (request.method == "GET" && parsedUrl.path == "/listings") {
+    // console.log("what we want happened!");
+    response.end(listingData);
+  }
+  else {
+    response.statusCode = 404;
+    response.end("Bad gateway error");
+  }
 
   /*
     Your request handler should send listingData in the JSON format if a GET request 
@@ -23,4 +34,7 @@ fs.readFile('listings.json', 'utf8', function(err, data) {
     This callback function should save the data in the listingData variable, 
     then start the server. 
    */
+  listingData = data;
+  server = http.createServer(requestHandler);
+  server.listen(port);
 });
