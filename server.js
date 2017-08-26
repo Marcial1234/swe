@@ -16,6 +16,7 @@ var requestHandler = function(request, response) {
     response.end(listingData);
   }
   else {
+    // response.writeHead() ??
     response.statusCode = 404;
     response.end("Bad gateway error");
   }
