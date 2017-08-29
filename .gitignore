@@ -1,5 +1,10 @@
-# OSX
+# osx
 .DS_Store
 
-# Node
+# configuration files
+server/config/config.js
+
+# node
 node_modules
+
+*.zip

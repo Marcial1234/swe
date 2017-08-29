@@ -1,78 +1,100 @@
-# Screenshot
-![Screenshot](SWE_1.png)
+# Creating a server-side CRUD module using Express
+In assignment 1, we created a simple node server that retrieved our listings by responding to GET requests to '/listings'. You are now going to add more functionality to this server that allows us to **create**, **read**, **update**, and **delete** listings from a Mongo database. These tasks are commonly referred to as CRUD. 
 
-# Introduction to HTTP and Asynchronous Programming using Node.js
-In this assignment we will start to build our UF Directory application. We will use [Node.js](https://en.wikipedia.org/wiki/Node.js) and some of its built in modules to implement a server that provides directory data to clients. 
-### What is HTTP? (Make sure to read [this](http://code.tutsplus.com/tutorials/http-the-protocol-every-web-developer-must-know-part-1--net-31177))
-HTTP (Hypertext Transfer Protocol) is a **stateless** protocol that allows computers to communicate with each other. We use HTTP to allow our client application (the one users see) to communicate with a server that stores and manipulates data relevant to the user.
+## Introduction to Express
 
-HTTP basically boils down to a *request* and a *response*. A client makes a request to either retreive, add, delete, or modify data in some fashion. The host recieves this request, and will provide an appropriate response back to the client. In our case, the server will handle requests for directory listings by responding with listing data in the [JSON](http://stackoverflow.com/questions/383692/what-is-json-and-why-would-i-use-it) format.
+While these new requests could be handled in the same fashion as the original request handler, it would quickly become unweildly. There would need to be a bunch of conditional statements to handle requests to the different URL paths and different HTTP methods (such as POST, PUT, and DELETE). Luckily, the [**Express**](http://expressjs.com/en/index.html) library makes this task much simpler by providing a layer of abstraction for handling HTTP requests in a Node server. 
 
-### What is Node.js?
-Node.js is a Javascript runtime environment built on Google's V8 engine. In other terms, it is a program that interprets Javascript. If I made a file named `hello.js` with the line
-```javascript
-console.log('Hello, world!');
-```
-and then typed the command `node hello.js` in my terminal, I should expect to see the text 
-`Hello, world!` printed on the screen. 
-
-Node is well known for its ability to run code **asynchronously**.  This means that input and output are non-blocking, and the process of one function does not stop the execution of another. The way this asynchronous code is implemented is through **callback** functions, which are called after a certain process has been completed. The best way to illustrate this is through example. 
-
-This is a simple server that responds to all requests with the text `Request received!`.
+To provide an example, here is the request handler we wrote in assignment 1:
 
 ```javascript
-var http = require('http'); 
-var port = 8080; 
-
 var requestHandler = function(request, response) {
-  response.end('Request received!');
+  var parsedUrl = url.parse(request.url);
+
+  if(request.method === 'GET') {
+    if(parsedUrl.path === '/listings') {
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.end(JSON.stringify(listingData));
+    } else {
+      response.writeHead(404);
+      response.end('Bad gateway error'); 
+    }
+  } else {
+    response.writeHead(404);
+    response.end('Bad gateway error');
+  }
+};
+```
+
+Now here is the same request handler written using Express:
+```javascript
+app.get('/listings', function(req, res) {
+  res.send(listingData);
+});
+
+app.all('/*', function(req, res) {
+  res.status(404).send('Bad gateway error');
+});
+```
+
+## Middleware
+Understanding the concept of **middleware** is extremely important in using Express effectively. Middleware allows you to invoke functions on a request before it reaches its final request handler. As a simple (yet quite useless) example, let's add a greeting to each request made to the server. 
+
+```javascript
+app.use(function(req, res, next) {
+  req.greeting = 'Hello there!';
+  next();
+});
+
+app.get('/', function(req, res) {
+  res.send(req.greeting);
+});
+```
+In addition to the usual request and response objects, we now pass an additional object called *next*. Invoking *next* will pass the request on to whatever function is next in line to handle it. 
+
+Now, let's say the application we are building has users with administrative privledges. There will be certain routes that we want to make sure the user has the correct privledges before allowing the request to be handled. Using express, this becomes a relatively simple task:
+
+```javascript
+var checkPermissions = function(req, res, next) {
+  if(req.isAdmin === true) {
+    next();
+  } else {
+    res.status(400).send('User does not have permission to access this path');
+  }
 };
 
-// a server is created, but not started
-var server = http.createServer(requestHandler);
-
-// the server is now started, listening for requests on port 8080
-server.listen(port, function() {
-  //once the server is listening, this callback function is executed
-  console.log('Server listening on: http://127.0.0.1:' + port);
+app.get('/privateData', checkPermissions, function(req, res) {
+  res.send('Some really critical information');
 });
-console.log('Is the server started?');
 ```
-Which log statement do you expect to be printed first? Answer this, then type the command `node simpleServer.js` and see if the results match up with what you were thinking. `Is the server started?` gets printed first is because the call to `server.listen()` is asynchronous in nature. While server.listen() is not finished, the control flow gets passed to the next line of the program. Once server.listen() is finished, it executes the *callback*, defined by the anonymous function: 
-```javascript
-function() {
-    console.log('Server listening on: http://127.0.0.1:' + port);
-}
-```
-Before continuing to the assignment, [these](http://www.theprojectspot.com/tutorial-post/Node-js-for-beginners-part-1-hello-world/2) [two](http://www.theprojectspot.com/tutorial-post/nodejs-for-beginners-callbacks/4) tutorials will help you further understand how Node is used to create servers and the nature of callback functions. 
 
-As you may imagine, the utility of the above server is quite low, since it has no ability to differentiate between requests and respond in the appropriate fashion.
+The checkPermissions function serves as *middleware* that is invoked before passing the request to its final destination. 
 
-## Assignment
-Your objective is to create a server that provides listing data from a JSON file. To accomplish this, you will: 
-- use the File System module to load `listings.json` into memory  
-- create a request handler with the URL module to send the listing data on a GET request to `localhost:8080/listings`
-- use the HTTP module to create a server that makes use of this request handler
+A final note: **order matters** when using middleware. If you place `app.use()` after a request handler, that middleware will not be invoked. Keep this in mind when developing your applications in case you encounter bugs. 
 
-We have provided skeleton code that will help guide you in completing this assignment. There is also a file named `server.tests.js` containing unit tests to test your server once completed. 
+If the concept of middleware is still confusing, you can read [this blog post](https://www.safaribooksonline.com/blog/2014/03/10/express-js-middleware-demystified/) for further information. 
 
-# Instructions: 
+## Assignment Details
+Now go ahead and clone this assignment's repository. You'll notice that the file structure of the application is now more involved than previous assignments. Browse around and take note of where each part of the application exists. 
 
-1. Make sure you have [Node.js](https://nodejs.org/en/) installed
-2. Clone this repository and then navigate to it on your local machine's terminal 
-  See Link for details on how to clone repository - (https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
-3. Install the mocha testing framework with the command `npm install -g mocha`
-4. Use `npm install` to download all necessary dependencies
-5. Implement the server by filling in code blocks found in `server.js`, then test your implementation with the command `mocha server.tests.js`. (make sure your server is running before trying to run the tests!)
+Navigate to `server/config/express.js`. This is where you will place code to configure your Express application. The **morgan** module is used to log requests to the console for debugging purposes. The **body parser** module is middleware that will allow you to access any data sent in requests as `req.body`. 
 
-Some resources you may find useful: 
-- [Creating an HTTP server in Node.js](http://www.sitepoint.com/creating-a-http-server-in-node-js/)
-- URL [Parsing](https://nodejs.org/api/url.html#url_url_parsing)
-- The [HTTP module](https://nodejs.org/api/http.html)
-    - [response.writeHead()](https://nodejs.org/api/http.html#http_response_writehead_statuscode_statusmessage_headers)
-    - [response.end()](https://nodejs.org/api/http.html#http_response_end_data_encoding_callback)
-- The File System's [readFile() method](https://nodejs.org/api/fs.html#fs_fs_readfile_file_options_callback)
+In `server/routes/listings.server.routes.js`, you will find code that specifies the request handlers for CRUD tasks. To learn more about the Express router, [go to this page](http://expressjs.com/en/guide/routing.html) and scroll down to the section on *express.Router.*
+
+### Part 1
+Create a diagram of how the different parts of the server interact with one another. Specifially make note of: 
+   - what is defined in the controllers
+   - how the router makes use of the controllers to determine the flow of request handling
+   - how middleware is used throughout the application to modularize the code
 
 
+### Part 2
 
+1. Implement the request handlers in `listings.server.controller.js`
+    - test your implementation by running the tests found in `listings.server.routes.test.js`
+2. Complete the app configuration in `express.js`. 
+    - serve the static files found in the public folder when a user makes a request to the path `/`. [Refer to this documentation](http://expressjs.com/en/starter/static-files.html) for help
+    - use the listings router for requests going to the `/api/listings` path 
+    - direct users to the client side `index.html` file for requests to any other path
+3. Make sure your server is functioning correctly by starting it up by running the command `node server.js`
 
