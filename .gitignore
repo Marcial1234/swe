@@ -7,4 +7,5 @@ server/config/config.js
 # node
 node_modules
 
-*.zip
+# bower
+public

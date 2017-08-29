@@ -110,9 +110,8 @@ describe('Listings CRUD tests', function() {
         if(err) throw err;
         done();
       })
-    }
-    else {
-        done();
+    } else {
+      done();
     }
   });
 });

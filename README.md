@@ -1,100 +1,55 @@
-# Creating a server-side CRUD module using Express
-In assignment 1, we created a simple node server that retrieved our listings by responding to GET requests to '/listings'. You are now going to add more functionality to this server that allows us to **create**, **read**, **update**, and **delete** listings from a Mongo database. These tasks are commonly referred to as CRUD. 
+# Assignment 5: Using our server API and implementing state on the front-end
+In this final assignment, we will work on integrating the back-end with our Angular code, and also making the client-side code more modular by introducing the concept of state. 
 
-## Introduction to Express
-
-While these new requests could be handled in the same fashion as the original request handler, it would quickly become unweildly. There would need to be a bunch of conditional statements to handle requests to the different URL paths and different HTTP methods (such as POST, PUT, and DELETE). Luckily, the [**Express**](http://expressjs.com/en/index.html) library makes this task much simpler by providing a layer of abstraction for handling HTTP requests in a Node server. 
-
-To provide an example, here is the request handler we wrote in assignment 1:
+### Using $http to make requests 
+Now that we have created a server that handles all the CRUD tasks associated with directory listings, we are ready to incorporate this into the Angular application. The [$http](https://docs.angularjs.org/api/ng/service/$http) service makes it possible to make requests to retrieve data from an external source. Calls to $http are asynchronous, so we again must handle the data they retrieve through callbacks. Here is a sample GET request from the AngularJS docs: 
 
 ```javascript
-var requestHandler = function(request, response) {
-  var parsedUrl = url.parse(request.url);
-
-  if(request.method === 'GET') {
-    if(parsedUrl.path === '/listings') {
-      response.writeHead(200, { 'Content-Type': 'application/json' });
-      response.end(JSON.stringify(listingData));
-    } else {
-      response.writeHead(404);
-      response.end('Bad gateway error'); 
-    }
-  } else {
-    response.writeHead(404);
-    response.end('Bad gateway error');
-  }
-};
+$http({
+  method: 'GET',
+  url: '/someUrl'
+}).then(function successCallback(response) {
+    // this callback will be called asynchronously
+    // when the response is available
+  }, function errorCallback(response) {
+    // called asynchronously if an error occurs
+    // or server returns response with an error status.
+  });
 ```
 
-Now here is the same request handler written using Express:
-```javascript
-app.get('/listings', function(req, res) {
-  res.send(listingData);
-});
+If you take a look at the listing factory, you will notice that it is no longer returns a JSON object, but rather has methods that allow us to retrieve the same data from our server through requests made via $http. If you navigate to the controller, you will see some examples of how the factory's methods are used to handle the asynchronous requests to our server API. You will be responsible for fully integrating the front-end with the server to provide a user interface to view, create, update, and delete listings. 
 
-app.all('/*', function(req, res) {
-  res.status(404).send('Bad gateway error');
-});
-```
+### Angular-UI Router
+We will use [**Angular-UI Router**](https://github.com/angular-ui/ui-router/wiki), which is a framework that allows us to implement client-side routing with the concept of state. 
 
-## Middleware
-Understanding the concept of **middleware** is extremely important in using Express effectively. Middleware allows you to invoke functions on a request before it reaches its final request handler. As a simple (yet quite useless) example, let's add a greeting to each request made to the server. 
+On the server-side, the concept of "routing" refers to how Express handles requests made to the API. On the client-side, "routing" stands for something slightly different. In our application, the user will have several views that they can navigate to (a list view, individual listing view, map view, etc). Each of these parts of the user interface can be considered a specific **state** of the application. When I navigate to the map view, the applications "state" could be associated with displaying a map. 
 
-```javascript
-app.use(function(req, res, next) {
-  req.greeting = 'Hello there!';
-  next();
-});
+Ideally, these states should have a URL associated with them. If a user is to type `www.directoryapp.com/listings/map` in the browser, they should see the map view discussed previously. This is where client-side routing differs from server-side routing. On the client-side, each URL is associated with a *specific application state*. 
 
-app.get('/', function(req, res) {
-  res.send(req.greeting);
-});
-```
-In addition to the usual request and response objects, we now pass an additional object called *next*. Invoking *next* will pass the request on to whatever function is next in line to handle it. 
+Go to the routes defined in the client-side config folder. You will notice there are several states associated with different views. 
+- If I were to type `http://localhost:8080/listings` into the browser, the UI-Router code defined in the routes should take me to the state `listings.list`
+- Now take a look at the view associated with `listings.list`. When this view is initialized, a call is made to the server to retrieve all listings via the `find()` method defined in the `ListingsController`, and the view is populated with the results of this call.
 
-Now, let's say the application we are building has users with administrative privledges. There will be certain routes that we want to make sure the user has the correct privledges before allowing the request to be handled. Using express, this becomes a relatively simple task:
+View [this tutorial](https://scotch.io/tutorials/angular-routing-using-ui-router) for more information on using Angular UI Router. Also refer to the [wiki](https://github.com/angular-ui/ui-router/wiki) for an in-depth explanation of the router's mechanisms. 
 
-```javascript
-var checkPermissions = function(req, res, next) {
-  if(req.isAdmin === true) {
-    next();
-  } else {
-    res.status(400).send('User does not have permission to access this path');
-  }
-};
+### Prerequisites
+- clone the repository
+- in the project directory run `npm install` and `bower install`
 
-app.get('/privateData', checkPermissions, function(req, res) {
-  res.send('Some really critical information');
-});
-```
-
-The checkPermissions function serves as *middleware* that is invoked before passing the request to its final destination. 
-
-A final note: **order matters** when using middleware. If you place `app.use()` after a request handler, that middleware will not be invoked. Keep this in mind when developing your applications in case you encounter bugs. 
-
-If the concept of middleware is still confusing, you can read [this blog post](https://www.safaribooksonline.com/blog/2014/03/10/express-js-middleware-demystified/) for further information. 
-
-## Assignment Details
-Now go ahead and clone this assignment's repository. You'll notice that the file structure of the application is now more involved than previous assignments. Browse around and take note of where each part of the application exists. 
-
-Navigate to `server/config/express.js`. This is where you will place code to configure your Express application. The **morgan** module is used to log requests to the console for debugging purposes. The **body parser** module is middleware that will allow you to access any data sent in requests as `req.body`. 
-
-In `server/routes/listings.server.routes.js`, you will find code that specifies the request handlers for CRUD tasks. To learn more about the Express router, [go to this page](http://expressjs.com/en/guide/routing.html) and scroll down to the section on *express.Router.*
-
-### Part 1
-Create a diagram of how the different parts of the server interact with one another. Specifially make note of: 
-   - what is defined in the controllers
-   - how the router makes use of the controllers to determine the flow of request handling
-   - how middleware is used throughout the application to modularize the code
+### Assignment, Part 1
+Taking a look at the source code, you should notice that the file structure is much more involved than previous assignments. Like assignment 4, before implementing any code you should diagram out how the different parts of the application are communicating with one another. 
+Take note specifically of:
+   - the interactions between the router, the view, the controller, and the server-side API in order to create an *integrated* full-stack web application
+   - *error handling* for asynchronous calls to the server
+   - indicating to the user that a server-side request is *loading*
+   - indicating to the user that input was *successfully handled*
 
 
-### Part 2
-
-1. Implement the request handlers in `listings.server.controller.js`
-    - test your implementation by running the tests found in `listings.server.routes.test.js`
-2. Complete the app configuration in `express.js`. 
-    - serve the static files found in the public folder when a user makes a request to the path `/`. [Refer to this documentation](http://expressjs.com/en/starter/static-files.html) for help
-    - use the listings router for requests going to the `/api/listings` path 
-    - direct users to the client side `index.html` file for requests to any other path
-3. Make sure your server is functioning correctly by starting it up by running the command `node server.js`
-
+### Assignment, Part 2
+1. Configure the application to maintain 2 additional states
+    - `listings.edit`
+    - `listings.map`
+2. Implement the incomplete functions in the `ListingsController` to: 
+    - update listings
+    - remove listings
+3. Create views for the `listings.edit` and `listings.map` states

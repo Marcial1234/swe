@@ -3,17 +3,13 @@ var should = require('should'),
     Listing = require('../models/listings.server.model'), 
     config = require('../config/config');
 
-var listing, id;
+var listing = {
+  code: 'LBWEST',
+  name: 'Library West', 
+  address: '1545 W University Ave, Gainesville, FL 32603, United States'
+};
 
-listing =  {
-  code: "LBWEST", 
-  name: "Library West", 
-  coordinates: {
-    latitude: 29.6508246, 
-    longitude: -82.3417565
-  }, 
-  address: "1545 W University Ave, Gainesville, FL 32603, United States"
-}
+var id;
 
 describe('Listing Schema Unit Tests', function() {
 
@@ -24,8 +20,9 @@ describe('Listing Schema Unit Tests', function() {
 
   describe('Saving to database', function() {
     /*
-      Mocha's default timeout for tests is 2000ms. To ensure that the tests do not fail 
-      prematurely, we can increase the timeout setting with the method this.timeout()
+      Mocha's default timeout for tests is 2000ms. Saving to MongoDB is an asynchronous task 
+      that may take longer thatn 2000ms. To ensure that the tests do not fail prematurely, 
+      we can increase the timeout setting with the method this.timeout()
      */
     this.timeout(10000);
 
@@ -33,17 +30,17 @@ describe('Listing Schema Unit Tests', function() {
       new Listing({
         name: listing.name, 
         code: listing.code
-      }).save(function(err, listing){
+      }).save(function(err, doc){
         should.not.exist(err);
-        id = listing._id;
+        id = doc._id;
         done();
       });
     });
 
     it('saves properly when all three properties provided', function(done){
-      new Listing(listing).save(function(err, listing){
+      new Listing(listing).save(function(err, doc){
         should.not.exist(err);
-        id = listing._id;
+        id = doc._id;
         done();
       });
     });
@@ -70,7 +67,7 @@ describe('Listing Schema Unit Tests', function() {
 
   afterEach(function(done) {
     if(id) {
-      Listing.remove({ _id: id }).exec(function() {
+      Listing.remove({_id: id}, function(err){
         id = null;
         done();
       });

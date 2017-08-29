@@ -20,18 +20,22 @@ module.exports.init = function() {
   //body parsing middleware 
   app.use(bodyParser.json());
 
+  /* serve static files */
+  app.use('/', express.static(__dirname + '/../../client'));
+  app.use('/public', express.static(__dirname + '/../../public'));
+
+  /* use the listings router for requests to the api */
+  app.use('/api/listings', listingsRouter);
+
   /* server wrapper around Google Maps API to get latitude + longitude coordinates from address */
   app.post('/api/coordinates', getCoordinates, function(req, res) {
     res.send(req.results);
   });
 
-  /* serve static files */
-  
-
-  /* use the listings router for requests to the api */
-
-
   /* go to homepage for all routes not specified */ 
+  app.all('/*', function(req, res) {
+    res.sendFile(path.resolve('client/index.html'));
+  });
 
   return app;
 };  
