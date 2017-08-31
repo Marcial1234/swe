@@ -7,9 +7,6 @@ angular.module('listings').controller('ListingsController', ['$scope', 'Listings
     $scope.listings = Listings;
     $scope.detailedInfo = undefined;
 
-    // maintain unique codes? why not!
-    codes = [];
-
     /* 
       Implement these functions in the controller to make your application function 
       as described in the assignment spec. 

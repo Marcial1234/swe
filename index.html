@@ -7,7 +7,9 @@
   <body ng-app="directoryApp">
     <div class="container">
       <div class="row row col-md-12">
-        <h1 style="text-align: center">UF Directory App</h1>
+        <center>
+          <h1> UF Directory App </h1>
+        </center>
       </div>
       <div class="row" ng-controller="ListingsController">
         <div class="col-md-6">
@@ -43,8 +45,8 @@
                 <th>
                   <button class="btn-outline-danger btn"
                           ng-click="deleteListing(item)"
-                          title="Delete '{{item.name}}' from current list">
-                      Delete
+                          title="Delete '{{item.name}}' from list">
+                    Delete
                   </button>
                 </th>
               </tr>
@@ -56,8 +58,8 @@
           <!-- better looks, hidding mechanism -->
           <form id="addform" ng-submit="addListing()">
             <div class="form-group">
-              <input class="form-control" ng-model="code" placeholder="Class Code (required!)" required=" ">
-              <input class="form-control" ng-model="name" placeholder="Class Name (required!)" required="">
+              <input class="form-control" ng-model="code" placeholder="Class Code (required!)" required>
+              <input class="form-control" ng-model="name" placeholder="Class Name (required!)" required>
             </div>
             <div class="form-group">
               <input class="form-control" ng-model="address" placeholder="Class Address">
