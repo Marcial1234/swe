@@ -1,9 +1,9 @@
 # Screenshots
-![Main looks](main_look.png)
-![Filters + Details](filtered_detailed.png)
-![new_class](new_class.png)
-![new_class_shown](new_class_shown.png)
-![Delted](deleted.png)
+![Main looks](main_look.PNG)
+![Filters + Details](filtered_detailed.PNG)
+![new_class](new_class.PNG)
+![new_class_shown](new_class_shown.PNG)
+![Delted](deleted.PNG)
 
 
 # Introduction to Front-end development with Angular.js
