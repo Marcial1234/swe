@@ -1,10 +1,9 @@
-GOOGLE_MAPS_BASIC_MAP = "https://www.google.com/maps/place/"
-
-// todo => pretty add
+GOOGLE_MAPS_BASIC_MAP = 'https://www.google.com/maps/place/'
 
 angular.module('listings').controller('ListingsController', ['$scope', 'Listings', 
   function($scope, Listings) {
     $scope.listings = Listings;
+    $scope.showButton = true;
     $scope.detailedInfo = undefined;
 
     /* 
@@ -12,7 +11,15 @@ angular.module('listings').controller('ListingsController', ['$scope', 'Listings
       as described in the assignment spec. 
      */
 
+    $scope.hideAndResetModal = function() {
+      // Hide modal and clear the rest of the values
+      $('#newClassForm').modal('hide');
+      $('#addform').find('input').val('');
+    }
+
     $scope.addListing = function() {
+      $scope.hideAndResetModal();
+
       // Create some input field, make some mandatory at least 'name' ? 
       // append to listsing object
       var new_listing = {};

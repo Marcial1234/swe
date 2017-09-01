@@ -46,7 +46,7 @@
                   <button class="btn-outline-danger btn"
                           ng-click="deleteListing(item)"
                           title="Delete '{{item.name}}' from list">
-                    Delete
+                    <span class="glyphicon glyphicon-trash"></span>
                   </button>
                 </th>
               </tr>
@@ -55,22 +55,39 @@
           <!--
               Write an HTML form that adds new listings to the directory
             -->
-          <!-- better looks, hidding mechanism -->
-          <form id="addform" ng-submit="addListing()">
-            <div class="form-group">
-              <input class="form-control" ng-model="code" placeholder="Class Code (required!)" required>
-              <input class="form-control" ng-model="name" placeholder="Class Name (required!)" required>
+          <br/>
+          <center>
+            <button class="btn btn-primary" 
+                    data-toggle="modal"
+                    data-target="#newClassForm">
+              Add new class
+            </button>
+          </center>
+          <center>
+            <div class="modal fade" id="newClassForm">
+              <div class="modal-content" style="margin: 30px; max-width: 550px;">
+              <center><h3>Add a new class to the list</h3></center>
+              <div class="modal-body">
+                <form id="addform" ng-submit="addListing()">
+                  <div class="form-group">
+                    <input class="form-control" ng-model="code" placeholder="Class Code (required!)" required>
+                    <input class="form-control" ng-model="name" placeholder="Class Name (required!)" required>
+                  </div>
+                  <div class="form-group">
+                    <input class="form-control" ng-model="address" placeholder="Class Address">
+                    <input class="half-form-control" ng-model="latitude" placeholder="Latitude" type="number" step="any">
+                    <input class="half-form-control" ng-model="longitude" placeholder="Longitude" type="number" step="any">
+                  </div>
+                  <center>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button class="btn btn-default" ng-click="hideAndResetModal()">Cancel</button>
+                  </center>
+                  <input type="submit" style="display: none"/>
+                </form>
+              </div>
+              </div>
             </div>
-            <div class="form-group">
-              <input class="form-control" ng-model="address" placeholder="Class Address">
-              <input class="half-form-control" ng-model="latitude" placeholder="Latitude" type="number" step="any">
-              <input class="half-form-control" ng-model="longitude" placeholder="Longitude" type="number" step="any">
-            </div>
-            <center>
-              <button type="submit" class="btn btn-success">Submit</button>
-            </center>
-            <input type="submit" style="display: none" />
-          </form>
+          </center>
         </div>
 
         <!-- FOR VISUAL SPACING -->
@@ -78,6 +95,9 @@
         <!-- FOR VISUAL SPACING -->
 
         <div class="col-md-5">
+          <div ng-if="!detailedInfo" class="jumbotron">
+            <h3>Click a class and you'll see its details here!</h3>
+          </div>
           <div ng-if="detailedInfo" class="jumbotron">
             <h2>Detailed Information</h2>
             <ul ng-repeat="atr in detailedInfo">
@@ -106,12 +126,10 @@
                    * consider how to use ng-click within the the table to implement this feature
              -->
           </div>
-          <div ng-if="!detailedInfo" class="jumbotron">
-            <h3>Click a class and you'll see its details here!</h3>
-          </div>
         </div>
       </div>
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
     <script type="text/javascript">
