@@ -2,6 +2,10 @@
   margin: 15px 10px;
 }
 
+h1 {
+  text-align: center;
+}
+
 nav {
   margin-top: 20px;
   margin-left: 60px;
@@ -20,9 +24,10 @@ nav {
 
 .formWrapper {
   border-radius: 5px;
-  background-color: #e5f2ff;
+  padding: 5px;
   padding-left: 60px;
   padding-right: 60px;
+  background-color: #e5f2ff;
 }
 
 .angular-google-map-container {

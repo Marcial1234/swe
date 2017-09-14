@@ -36,7 +36,7 @@
           When a user clicks on a table row, the view will display a single listing and the state change will be
           reflected in the browser's URL. 
           -->
-        <tr ng-repeat="listing in listings | filter: query" ui-sref="listings.view({ listingId: listing._id })">
+        <tr ng-repeat="listing in listings | orderBy: listing | filter: query" ui-sref="listings.view({listingId: listing._id})">
           <td>{{listing.code}}</td>
           <td>{{listing.name}}</td>
         </tr>

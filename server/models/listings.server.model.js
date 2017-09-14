@@ -10,14 +10,14 @@ var listingSchema = new Schema({
   }, 
   code: {
     type: String, 
-    required: true, 
-    unique: true
+    unique: true,
+    required: true
   }, 
-  address: String, 
   coordinates: {
     latitude: Number, 
     longitude: Number
   },
+  address: String, 
   created_at: Date,
   updated_at: Date
 });
@@ -26,11 +26,17 @@ var listingSchema = new Schema({
 listingSchema.pre('save', function(next) {
   var currentTime = new Date;
   this.updated_at = currentTime;
-  if(!this.created_at)
+
+  // I dont think this works, but ok ~
+  // cuz of async ofc...
+  if (!this.created_at)
   {
     this.created_at = currentTime;
+    next();
+  } else {
+    next();
   }
-  next();
+  
 });
 
 /* Use your schema to instantiate a Mongoose model */
