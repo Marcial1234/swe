@@ -6,15 +6,9 @@ angular.module('listings', []);
 var app = angular.module('directoryApp', ['ui.router', 'ui.bootstrap', 'uiGmapgoogle-maps', 'listings']);
 
 /* application configuration */
-app.config(['$urlRouterProvider', '$locationProvider', 'uiGmapGoogleMapApiProvider',
-  function($urlRouterProvider, $locationProvider, uiGmapGoogleMapApiProvider) {
+app.config(['$urlRouterProvider', '$locationProvider',
+  function($urlRouterProvider, $locationProvider) {
     
-    // will have to expose if i get it to work
-    // uiGmapGoogleMapApiProvider.configure({
-    //   key: process.env.GOOGLE_KEY,
-    //   libraries: 'weather,geometry,visualization'
-    // });
-
     /* https://docs.angularjs.org/api/ng/provider/$locationProvider */
     $locationProvider.html5Mode(true);
 

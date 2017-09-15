@@ -1,25 +1,20 @@
 angular.module('listings').controller('ListingsController',
-  ['$scope', '$location', '$stateParams', '$state', 'Listings', 'uiGmapGoogleMapApi',
-  function($scope, $location, $stateParams, $state, Listings, uiGmapGoogleMapApi){
+  ['$scope', '$location', '$stateParams', '$state', 'Listings',
+  function($scope, $location, $stateParams, $state, Listings){
 
     /* Bind the success message to the scope if it exists as part of the current state */
-    if($stateParams.successMessage) {
+    if ($stateParams.successMessage) {
       $scope.success = $stateParams.successMessage;
     }
 
-      // uiGmapGoogleMapApi.then(function(maps) {
-      // });
-    $scope.map = function() {
-        $scope.showMap = true;
-        /* Map properties */
-        $scope.map = {
-          center: {
-            latitude: 29.65163059999999,
-            longitude: -82.3410518
-          },
-          zoom: 14
-        }
-        console.log(maps);
+    $scope.showMap = true;
+    /* Map properties */
+    $scope.map = {
+      center: {
+        latitude: 29.65163059999999,
+        longitude: -82.3410518
+      },
+      zoom: 14
     }
 
     $scope.find = function() {
