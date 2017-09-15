@@ -9,10 +9,11 @@ var app = angular.module('directoryApp', ['ui.router', 'ui.bootstrap', 'uiGmapgo
 app.config(['$urlRouterProvider', '$locationProvider', 'uiGmapGoogleMapApiProvider',
   function($urlRouterProvider, $locationProvider, uiGmapGoogleMapApiProvider) {
     
-    uiGmapGoogleMapApiProvider.configure({
-      key: 'AIzaSyD5OCIvBoNwgRkZ_0SP_NMGoqqHWpPLSZc',
-      libraries: 'weather,geometry,visualization'
-    });
+    // will have to expose if i get it to work
+    // uiGmapGoogleMapApiProvider.configure({
+    //   key: process.env.GOOGLE_KEY,
+    //   libraries: 'weather,geometry,visualization'
+    // });
 
     /* https://docs.angularjs.org/api/ng/provider/$locationProvider */
     $locationProvider.html5Mode(true);

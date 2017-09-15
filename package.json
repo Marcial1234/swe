@@ -5,8 +5,13 @@
   "main": "server.js",
   "author": "Medhir Bhargava",
   "license": "MIT",
+  "scripts": {
+    "start": "npm install && node server.js",
+    "postinstall": "bower install"
+  },
   "dependencies": {
     "body-parser": "^1.14.1",
+    "bower": "^1.8.2",
     "express": "^4.13.3",
     "mongoose": "^4.2.9",
     "morgan": "^1.6.1",
